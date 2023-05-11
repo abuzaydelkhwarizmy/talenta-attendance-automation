@@ -21,10 +21,12 @@ const PUBLIC_HOLIDAYS = [
   "23 Mar 2023", // nyepi
   "23 Mar 2023", // cuti bersama nyepi
   "7 Apr 2023", // wafat isa almasih
+  "19 Apr 2023", // idul fitri
+  "20 Apr 2023", // idul fitri
   "21 Apr 2023", // idul fitri
   "24 Apr 2023", // idul fitri
   "25 Apr 2023", // idul fitri
-  "26 Apr 2023", // idul fitri
+  "27 Apr 2023", // cuti
   "1 Mei 2023", // hari buruh
   "18 Mei 2023", // kenaikan isa almasih
   "1 Jun 2023", // hari lahir pancasila
@@ -90,13 +92,20 @@ const main = async () => {
   }
 
   const myName = (await page.locator("#navbar-name").textContent()).trim();
-  const whoIsOffToday = await page
-    .locator(".tl-card-small", { hasText: `Who's Off` })
-    .innerText();
 
-  const isOffToday = whoIsOffToday.includes(myName);
+  async function isOffToday(page, myName) {
+    // Wait for the "Who's Off" section to load
+    await page.waitForSelector('.tl-card-small', { timeout: 60000 });
+  
+    // Extract the names of people who are off today
+    const offPeople = await page.$$eval('.tl-leave-list__item .font-weight-bold', elems => elems.map(e => e.innerText));
+  
+    // Check if the user is off today
+    return offPeople.includes(myName);
+  }
 
-  if (isOffToday) {
+  const isUserOffToday = await isOffToday(page, myName);
+  if (isUserOffToday) {
     console.log("You are off today, skipping check in/out...");
     await browser.close();
     return;
@@ -104,7 +113,7 @@ const main = async () => {
 
   // go to "My Attendance Logs"
   await page.click("text=My Attendance Logs");
-  await page.waitForSelector(`h3:text("${myName}")`);
+  await page.waitForSelector('h1:text("My attendance log")');
   console.log(
     "Already inside My Attendance Logs to check holiday or day-off..."
   );
