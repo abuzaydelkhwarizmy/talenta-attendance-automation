@@ -80,10 +80,8 @@ const main = async () => {
   await page.fill("#user_password", process.env.ACCOUNT_PASSWORD);
 
   console.log("Signing in...");
-  await Promise.all([
-    page.click("#new-signin-button"),
-    page.waitForNavigation({ timeout: 600000 }), // wait up to 600 seconds
-  ]);
+  await page.click("#new-signin-button");
+  await page.waitForSelector('a[href="/employee/dashboard"]', { timeout: 60000 }); // wait up to 600 seconds   
 
   const dashboardNav = page.getByText("Dashboard");
   // check if dashboard nav is exist
@@ -191,3 +189,22 @@ const main = async () => {
 };
 
 main();
+
+async function mainLogic() {
+
+}
+
+const MAX_RETRIES = 3;
+
+for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+        await mainLogic();
+        break;  // exit the loop if successful
+    } catch (error) {
+        if (error.name === 'TimeoutError' && attempt < MAX_RETRIES) {
+            console.log(`Attempt ${attempt} failed due to a timeout. Retrying...`);
+        } else {
+            throw error;  // re-throw the error if it's not a TimeoutError or if we've reached the max retries
+        }
+    }
+}
