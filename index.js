@@ -81,7 +81,7 @@ const main = async () => {
 
   console.log("Signing in...");
   await page.click("#new-signin-button");
-  await page.waitForSelector('a[href="/employee/dashboard"]', { timeout: 60000 }); // wait up to 600 seconds   
+  await page.waitForSelector('a[href="/employee/dashboard"]', { timeout: 90000 }); // wait up to 600 seconds   
 
   const dashboardNav = page.getByText("Dashboard");
   // check if dashboard nav is exist
@@ -93,7 +93,7 @@ const main = async () => {
 
   async function isOffToday(page, myName) {
     // Wait for the "Who's Off" section to load
-    await page.waitForSelector('.tl-card-small', { timeout: 60000 });
+    await page.waitForSelector('.tl-card-small', { timeout: 90000 });
   
     // Extract the names of people who are off today
     const offPeople = await page.$$eval('.tl-leave-list__item .font-weight-bold', elems => elems.map(e => e.innerText));
