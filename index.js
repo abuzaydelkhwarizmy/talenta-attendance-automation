@@ -111,7 +111,7 @@ const main = async () => {
 
   // go to "My Attendance Logs"
   await page.click("text=My Attendance Logs");
-  await page.waitForSelector('h1:text("My attendance log")', { timeout: 60000 });
+  await page.waitForSelector('h1:text("My attendance log")', { timeout: 90000 });
   console.log(
     "Already inside My Attendance Logs to check holiday or day-off..."
   );
