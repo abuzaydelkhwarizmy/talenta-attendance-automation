@@ -39,7 +39,7 @@ const PUBLIC_HOLIDAYS = [
   "26 Dec 2023", // cuti bersama natal
 ];
 
-const main = async () => {
+async function mainLogic() {
   const isHeadless =
     (process.env.HEADLESS_BROWSER ?? "true") === "true" ? true : false;
 
@@ -67,12 +67,14 @@ const main = async () => {
 
   console.log("Opening login page...");
   await page.goto(
-    "https://account.mekari.com/users/sign_in?client_id=TAL-73645&return_to=L2F1dGg_Y2xpZW50X2lkPVRBTC03MzY0NSZyZXNwb25zZV90eXBlPWNvZGUmc2NvcGU9c3NvOnByb2ZpbGU%3D"
+    "https://account.mekari.com/users/sign_in?client_id=TAL-73645&return_to=L2F1dGg_Y2xpZW50X2lkPVRBTC03MzY0NSZyZXNwb25zZV90eXBlPWNvZGUmc2NvcGU9c3NvOnByb2ZpbGU%3D",
+    { timeout: 60000 } // Set timeout to 60 seconds
   );
 
   await page.setViewportSize({ width: 1080, height: 560 });
 
   console.log("Filling in account email & password...");
+  await page.waitForSelector("#user_email", { timeout: 60000 });
   await page.click("#user_email");
   await page.fill("#user_email", process.env.ACCOUNT_EMAIL);
 
@@ -81,7 +83,7 @@ const main = async () => {
 
   console.log("Signing in...");
   await page.click("#new-signin-button");
-  await page.waitForSelector('a[href="/employee/dashboard"]', { timeout: 90000 }); // wait up to 600 seconds   
+  await page.waitForSelector('a[href="/employee/dashboard"]', { timeout: 60000 }); // wait up to 60 seconds
 
   const dashboardNav = page.getByText("Dashboard");
   // check if dashboard nav is exist
@@ -93,7 +95,7 @@ const main = async () => {
 
   async function isOffToday(page, myName) {
     // Wait for the "Who's Off" section to load
-    await page.waitForSelector('.tl-card-small', { timeout: 90000 });
+    await page.waitForSelector('.tl-card-small', { timeout: 60000 });
   
     // Extract the names of people who are off today
     const offPeople = await page.$$eval('.tl-leave-list__item .font-weight-bold', elems => elems.map(e => e.innerText));
@@ -111,7 +113,7 @@ const main = async () => {
 
   // go to "My Attendance Logs"
   await page.click("text=My Attendance Logs");
-  await page.waitForSelector('h1:text("My attendance log")', { timeout: 90000 });
+  await page.waitForSelector('h1:text("My attendance log")', { timeout: 60000 });
   console.log(
     "Already inside My Attendance Logs to check holiday or day-off..."
   );
@@ -186,12 +188,6 @@ const main = async () => {
   }
 
   await browser.close();
-};
-
-main();
-
-async function mainLogic() {
-
 }
 
 const MAX_RETRIES = 3;
